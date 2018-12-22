@@ -43,7 +43,12 @@ class ParserCBF(object):
             __import__('pdb').set_trace()
 
     def player_full_name(self):
-        return self.__html.find(class_='list-desc').text.strip().title()
+        full_name = self.__html.find(class_='list-desc').text.strip().title()
+        full_name = full_name.replace(' De ', ' de ')
+        full_name = full_name.replace(' Da ', ' da ')
+        full_name = full_name.replace(' E ', ' e ')
+        full_name = full_name.replace(' Dos ', ' dos ')
+        return full_name
 
     def titular(self):
         return not self.reserva()
@@ -346,15 +351,6 @@ if __name__ == '__main__':
             '-'.join([str(dt.tm_year), str(dt.tm_mon), str(dt.tm_mday)])) + \
             "}}\n{{" + "Masculino Série A {}".format(2018) + "}}"
 
-        out = out.replace(
-            ' De ',
-            ' de ').replace(
-            ' Da ',
-            ' da ').replace(
-            ' E ',
-            ' e ').replace(
-                ' Dos ',
-            ' dos ')
         file_name = str(int(jogo / 10 + 1)) + "_" + mandante_nome[:3] + \
             visitante_nome[:3]
 
