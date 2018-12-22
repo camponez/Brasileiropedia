@@ -111,7 +111,25 @@ if __name__ == '__main__':
 
         times = placar.find_all('h3', class_='time-nome')
         mandante_nome = times[0].text.split('-')[0].strip()
+        if 'Atlético - MG' in times[0]:
+            mandante_nome = 'Atlético-MG'
+        elif 'Atlético - PR' in times[0]:
+            mandante_nome = 'Atlético-PR'
+        elif 'Atlético - GO' in times[0]:
+            mandante_nome = 'Atlético-GO'
+        elif 'América - MG' in times[0]:
+            mandante_nome = 'América-MG'
+
         visitante_nome = times[1].text.split('-')[0].strip()
+        if 'Atlético - MG' in times[1]:
+            visitantenome = 'Atlético-MG'
+        elif 'Atlético - PR' in times[1]:
+            visitantenome = 'Atlético-PR'
+        elif 'Atlético - GO' in times[1]:
+            visitantenome = 'Atlético-GO'
+        elif 'América - MG' in times[1]:
+            visitantenome = 'América-MG'
+
         gols = placar.find_all('strong', class_='time-gols')
 
         def players(l_players):
