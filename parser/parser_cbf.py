@@ -48,6 +48,7 @@ class ParserCBF(object):
         full_name = full_name.replace(' Da ', ' da ')
         full_name = full_name.replace(' E ', ' e ')
         full_name = full_name.replace(' Dos ', ' dos ')
+        full_name = full_name.replace(' Do ', ' do ')
         return full_name
 
     def titular(self):
@@ -90,9 +91,9 @@ if __name__ == '__main__':
 
         arbitragem = SOUP.find('table').find_all('td')
 
-        arbitros = {'arbitro': arbitragem[3].text.strip(),
-                    'aux1': arbitragem[6].text.strip(),
-                    'aux2': arbitragem[9].text.strip()}
+        arbitros = {'arbitro': arbitragem[0].text.strip(),
+                    'aux1': arbitragem[3].text.strip(),
+                    'aux2': arbitragem[6].text.strip()}
 
         placar = SOUP.find(class_='section-placar')
 
@@ -127,13 +128,13 @@ if __name__ == '__main__':
 
         visitante_nome = times[1].text.split('-')[0].strip()
         if 'Atlético - MG' in times[1]:
-            visitantenome = 'Atlético-MG'
-        elif 'Atlético - PR' in times[1]:
-            visitantenome = 'Atlético-PR'
-        elif 'Atlético - GO' in times[1]:
-            visitantenome = 'Atlético-GO'
-        elif 'América - MG' in times[1]:
-            visitantenome = 'América-MG'
+            visitante_nome = 'Atlético-MG'
+        elif 'Atlétic_o - PR' in times[1]:
+            visitante_nome = 'Atlético-PR'
+        elif 'Atlétic_o - GO' in times[1]:
+            visitante_nome = 'Atlético-GO'
+        elif 'América_ - MG' in times[1]:
+            visitante_nome = 'América-MG'
 
         gols = placar.find_all('strong', class_='time-gols')
 
@@ -189,6 +190,9 @@ if __name__ == '__main__':
                     'reserva': None}
             visitante['banco'].append(info)
 
+        rodada = int(jogo / 10)
+        rodada += 1 if jogo % 10 != 0 else 0
+
         out = "{{Ficha" + \
             "\n| mandante = {} ".format(mandante_nome) + \
             "\n| golsmandante = {}".format(gols[1].text) + \
@@ -199,7 +203,7 @@ if __name__ == '__main__':
             "Campeonato Brasileiro {} - Série A]]".format(ano) + \
             "\n| dia = {}".format(dia) + \
             "\n| ano = {}".format(ano) + \
-            "\n| hora = {}".format(hora) + \
+            "\n| hora = {}".format(hora).replace(':00', 'h') + \
             "\n| bandeira_arbitragem =" + \
             "\n| arbitro = {}".format(arbitros['arbitro']) + \
             "\n| auxiliar1 = {}".format(arbitros['aux1']) + \
@@ -219,21 +223,27 @@ if __name__ == '__main__':
             out += "\n| n{}.1 = {}".format(i, player['num'])
             out += "\n| j{}.1 = [[{}|{}]]".format(
                 i, player['nome_completo'], player['nome'])
-            out += " {{gol}}" * player['gols']
+            out += " {{gol|}}" * player['gols']
 
             if player['amarelo']:
-                out += " {{amar}}"
+                out += " {{amar|}}"
 
             if player['vermelho']:
-                out += " {{vermelho}}"
+                out += " {{vermelho|}}"
 
             if player['reserva']:
                 out += " {{subs|" + "{}. [[{}|{}]]".format(
-                    player['num'],
+                    player['reserva']['num'],
                     player['reserva']['nome_completo'],
                     player['reserva']['nome'])
-                out += " {{gol}}" * player['reserva']['gols']
-                out += "}}"
+                out += " {{gol|}}" * player['reserva']['gols']
+
+                if player['reserva']['amarelo']:
+                    out += " {{amar|}}"
+                if player['reserva']['vermelho']:
+                    out += " {{verm|}}"
+
+                out += "| }}"
             i += 1
 
         out += "\n| tec1 = \n"
@@ -244,7 +254,7 @@ if __name__ == '__main__':
             out += "\n| j{}.2 = [[{}|{}]]".format(
                 i, player['nome_completo'], player['nome'])
 
-            out += " {{gol}}" * player['gols']
+            out += " {{gol|}}" * player['gols']
 
             if player['amarelo']:
                 out += " {{amar}}"
@@ -254,13 +264,17 @@ if __name__ == '__main__':
 
             if player['reserva']:
                 out += " {{subs|" + "{}. [[{}|{}]]".format(
-                    player['num'],
+                    player['reserva']['num'],
                     player['reserva']['nome_completo'],
                     player['reserva']['nome'])
 
-                out += " {{gol}}" * player['gols']
+                out += " {{gol|}}" * player['reserva']['gols']
+                if player['reserva']['amarelo']:
+                    out += " {{amar}}"
+                if player['reserva']['vermelho']:
+                    out += " {{verm}}"
 
-                out += "}}"
+                out += "| }}"
             i += 1
 
         out += "\n| tec2 = \n"
@@ -351,7 +365,7 @@ if __name__ == '__main__':
             '-'.join([str(dt.tm_year), str(dt.tm_mon), str(dt.tm_mday)])) + \
             "}}\n{{" + "Masculino Série A {}".format(2018) + "}}"
 
-        file_name = str(int(jogo / 10 + 1)) + "_" + mandante_nome[:3] + \
+        file_name = str(rodada) + "_" + mandante_nome[:3] + \
             visitante_nome[:3]
 
         print('Done jogo {}: {} {}x{} {}'.format(jogo, mandante_nome,
@@ -359,6 +373,8 @@ if __name__ == '__main__':
                                                  gols[2].text,
                                                  visitante_nome))
         out = "{}\n\n\n".format(URL_FINAL) + out
-        f = open("./{}.txt".format(file_name), 'w')
+        file_path = "./{}.txt".format(file_name)
+        f = open(file_path, 'w')
         f.write(out)
         f.close()
+        print('Salvo em: {}'.format(file_path))
