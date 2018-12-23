@@ -193,6 +193,10 @@ if __name__ == '__main__':
         rodada = int(jogo / 10)
         rodada += 1 if jogo % 10 != 0 else 0
 
+        arquivo_sum_bor = mandante_nome[:3].lower() + \
+            visitante_nome[:3].lower() + \
+            str(dt.tm_mday) + str(dt.tm_mon) + str(dt.tm_year)
+
         out = "{{Ficha" + \
             "\n| mandante = {} ".format(mandante_nome) + \
             "\n| golsmandante = {}".format(gols[1].text) + \
@@ -214,10 +218,9 @@ if __name__ == '__main__':
             "\n| pagante =" + \
             "\n| presente =" + \
             "\n| renda = " + \
-            "\n| sumula = {{cbf_sumula|arquivo=" + "{}{}{}".format(
-                mandante_nome[:3].lower(), visitante_nome[:3].lower(),
-                str(dt.tm_mday) + str(dt.tm_mon) +
-                str(dt.tm_year)) + "}}"
+            "\n| sumula = {{" + \
+            "cbf_sumula|arquivo={}".format(arquivo_sum_bor) + \
+            "}}"
         i = 1
         for player in mandante['titular']:
             out += "\n| n{}.1 = {}".format(i, player['num'])
@@ -373,8 +376,16 @@ if __name__ == '__main__':
                                                  gols[2].text,
                                                  visitante_nome))
         out = "{}\n\n\n".format(URL_FINAL) + out
-        file_path = "./{}.txt".format(file_name)
+        file_path = "./{}_{}.txt".format(file_name, jogo)
         f = open(file_path, 'w')
         f.write(out)
         f.close()
+
+        link_sum_b = 'https://conteudo.cbf.com.br/sumulas/2018/142{}.pdf\n'
+
+        f_sum_b = open('sum_bor.list', 'a+')
+        f_sum_b.write(link_sum_b.format(str(jogo) + "se"))
+        f_sum_b.write(link_sum_b.format(str(jogo) + "b"))
+        f_sum_b.close()
+
         print('Salvo em: {}'.format(file_path))
