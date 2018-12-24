@@ -68,7 +68,7 @@ class ParserCBF(object):
     def vermelho(self):
         if not self.__html.i:
             return False
-        return 'icon--card' in self.__html.i.get('class')
+        return 'icon-red-card' in self.__html.i.get('class')
 
     def parse_page(self):
         """
@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
         if visitante['vermelho']:
             out += "\n\n|VermelhoVisitante="
-            for i in mandante['vermelho']:
+            for i in visitante['vermelho']:
                 out += "\n{};".format(i['nome_completo'])
             out += "\n|+sep=;\n"
 

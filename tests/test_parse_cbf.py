@@ -60,3 +60,18 @@ class TestCBFParse(object):
         self.parser.html = BeautifulSoup(html_code, 'html.parser')
 
         assert self.parser.amarelo()
+
+    def test_vermelho(self):
+        html_code = (
+            '<strong class="block list-title p-b-5">'
+            '              Rhodolfo'
+            '                              <i class="icon small'
+            '                              icon-red-card"></i> <i class="icon'
+            'pull-right"><svg width="26" height="21" viewBox="0 0 26 21"'
+            'xmlns="https://www.w3.org/2000/svg"><path d="M16 9h-5l8-9 7'
+            '9h-5v11h-5V9z" fill="#399C00"></path></svg></i></strong>'
+        )
+
+        self.parser.html = BeautifulSoup(html_code, 'html.parser')
+
+        assert self.parser.vermelho()
