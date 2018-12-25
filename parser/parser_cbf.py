@@ -70,6 +70,29 @@ class ParserCBF(object):
             return False
         return 'icon-red-card' in self.__html.i.get('class')
 
+    def arbitragem(self):
+
+        band = self.__html[2].text.strip()
+        band2 = self.__html[5].text.strip()
+        band3 = self.__html[8].text.strip()
+
+        arbitros = {
+            'bandeira': "{{Bandeira|" + band + "}}",
+            'arbitro': {
+                'nome': self.__html[0].text.strip(),
+                'bandeira': None},
+            'aux1': {
+                'nome': self.__html[3].text.strip(),
+                'bandeira': None if band2 == band
+                else "{{Bandeira|" + band2 + "}}"},
+            'aux2': {
+                'nome': self.__html[6].text.strip(),
+                'bandeira': None if band3 == band else
+                "{{Bandeira|" + band3 + "}}"}
+        }
+
+        return arbitros
+
     def parse_page(self):
         """
         TODO: move all the parsing
@@ -89,11 +112,8 @@ if __name__ == '__main__':
         PLAYERS = SOUP.find(
             class_='jogo-escalacao').find_all(class_='col-xs-6')
 
-        arbitragem = SOUP.find('table').find_all('td')
-
-        arbitros = {'arbitro': arbitragem[0].text.strip(),
-                    'aux1': arbitragem[3].text.strip(),
-                    'aux2': arbitragem[6].text.strip()}
+        PARSER.html = SOUP.find('table').find_all('td')
+        arbitragem = PARSER.arbitragem()
 
         placar = SOUP.find(class_='section-placar')
 
@@ -129,11 +149,11 @@ if __name__ == '__main__':
         visitante_nome = times[1].text.split('-')[0].strip()
         if 'Atlético - MG' in times[1]:
             visitante_nome = 'Atlético-MG'
-        elif 'Atlétic_o - PR' in times[1]:
+        elif 'Atlético - PR' in times[1]:
             visitante_nome = 'Atlético-PR'
-        elif 'Atlétic_o - GO' in times[1]:
+        elif 'Atlético - GO' in times[1]:
             visitante_nome = 'Atlético-GO'
-        elif 'América_ - MG' in times[1]:
+        elif 'América - MG' in times[1]:
             visitante_nome = 'América-MG'
 
         gols = placar.find_all('strong', class_='time-gols')
@@ -198,23 +218,33 @@ if __name__ == '__main__':
             str(dt.tm_mday) + str(dt.tm_mon) + str(dt.tm_year)
 
         out = "{{Ficha" + \
-            "\n| mandante = {} ".format(mandante_nome) + \
+            "\n| mandante = {} ".format(mandante_nome.strip()) + \
             "\n| golsmandante = {}".format(gols[1].text) + \
             "\n| visitante = {}".format(visitante_nome) + \
             "\n| golsvisitante = {}".format(gols[2].text) + \
-            "\n| rodada = {}ª rodada".format(int(jogo / 10) + 1) + \
+            "\n| rodada = {}ª rodada".format(rodada) + \
             "\n| motivo = [[Masculino Série A {}|".format(ano) + \
             "Campeonato Brasileiro {} - Série A]]".format(ano) + \
             "\n| dia = {}".format(dia) + \
             "\n| ano = {}".format(ano) + \
             "\n| hora = {}".format(hora).replace(':00', 'h') + \
-            "\n| bandeira_arbitragem =" + \
-            "\n| arbitro = {}".format(arbitros['arbitro']) + \
-            "\n| auxiliar1 = {}".format(arbitros['aux1']) + \
-            "\n| auxiliar2 = {}".format(arbitros['aux2']) + \
+            "\n| bandeira_arbitragem ={}".format(arbitragem['bandeira']) + \
+            "\n| arbitro = {}".format(arbitragem['arbitro']['nome'])
+
+        if arbitragem['aux1']['bandeira']:
+            out += "\n| bandeira_arbitragem = {}".format(
+                arbitragem['aux1']['bandeira'])
+
+        out += "\n| auxiliar1 = {}".format(arbitragem['aux1']['nome'])
+
+        if arbitragem['aux2']['bandeira']:
+            out += "\n| bandeira_arbitragem = {}".format(
+                arbitragem['aux2']['bandeira'])
+
+        out += "\n| auxiliar2 = {}".format(arbitragem['aux2']['nome']) + \
             "\n| cidade = {}".format(cidade.strip()) + \
             "\n| uf = {}".format(estado.strip()) + \
-            "\n| estadio = {}".format(estadio) + \
+            "\n| estadio = {}".format(estadio.strip()) + \
             "\n| pagante =" + \
             "\n| presente =" + \
             "\n| renda = " + \
@@ -232,7 +262,7 @@ if __name__ == '__main__':
                 out += " {{amar|}}"
 
             if player['vermelho']:
-                out += " {{vermelho|}}"
+                out += " {{verm|}}"
 
             if player['reserva']:
                 out += " {{subs|" + "{}. [[{}|{}]]".format(
@@ -263,7 +293,7 @@ if __name__ == '__main__':
                 out += " {{amar}}"
 
             if player['vermelho']:
-                out += " {{vermelho}}"
+                out += " {{verm}}"
 
             if player['reserva']:
                 out += " {{subs|" + "{}. [[{}|{}]]".format(
@@ -364,8 +394,14 @@ if __name__ == '__main__':
         for x in range(1, 5):
             out += mostrar_gols(gols_vis, x, 'Visitante')
 
+        mes = str(dt.tm_mon)
+        mes = "0{}".format(mes) if dt.tm_mon < 10 else mes
+
+        dia = str(dt.tm_mday)
+        dia = "0{}".format(dia) if dt.tm_mday < 10 else dia
+
         out += "}}\n\n{{DEFAULTSORT: " + " {}".format(
-            '-'.join([str(dt.tm_year), str(dt.tm_mon), str(dt.tm_mday)])) + \
+            '-'.join([str(dt.tm_year), mes, dia])) + \
             "}}\n{{" + "Masculino Série A {}".format(2018) + "}}"
 
         file_name = str(rodada) + "_" + mandante_nome[:3] + \
@@ -389,3 +425,7 @@ if __name__ == '__main__':
         f_sum_b.close()
 
         print('Salvo em: {}'.format(file_path))
+        print('https://brasileiropedia.com/{}_{}x{}_{}_-_{}/{}/{}'.
+              format(mandante_nome.replace(' ', '_'), gols[1].text.strip(),
+                     gols[2].text.strip(), visitante_nome.replace(' ', '_'),
+                     dia, mes, dt.tm_year))

@@ -75,3 +75,40 @@ class TestCBFParse(object):
         self.parser.html = BeautifulSoup(html_code, 'html.parser')
 
         assert self.parser.vermelho()
+
+    def test_arbitragem(self):
+        html_code = """
+                <table class="table"><thead><tr><th class="p-b-15 p-t-15">Função</th> <th class="p-b-15 p-t-15">Nome</th> <th class="p-b-15 p-t-15">Categoria</th> <th class="p-b-15 p-t-15">Federação</th></tr></thead> <tbody><tr><th scope="row">Árbitro</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=1042" target="_blank" rel="noopener">
+                  Dewson Fernando Freitas da Silva
+                </a></td> <td>FIFA</td> <td>PA</td></tr> <tr><th scope="row">Árbitro Assistente 1</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=596" target="_blank" rel="noopener">
+                  Cleriston Clay Barreto Rios
+                </a></td> <td>MTR</td> <td>SE</td></tr> <tr><th scope="row">Árbitro Assistente 2</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=862" target="_blank" rel="noopener">
+                  Heronildo S Freitas da Silva
+                </a></td> <td>AB</td> <td>PA</td></tr> <tr><th scope="row">Quarto Árbitro</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=976" target="_blank" rel="noopener">
+                  Pedro Martinelli Christino
+                </a></td> <td>AB</td> <td>PR</td></tr> <tr><th scope="row">Árbitro Assistente Adicional 1</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=1030" target="_blank" rel="noopener">
+                  Eduardo Cordeiro Guimaraes
+                </a></td> <td>CD</td> <td>SC</td></tr> <tr><th scope="row">Árbitro Assistente Adicional 2</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=14660" target="_blank" rel="noopener">
+                  Edson da Silva
+                </a></td> <td>CD</td> <td>SC</td></tr> <tr><th scope="row">Analista de Campo</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=1296" target="_blank" rel="noopener">
+                  Anderson Carlos Gonçalves
+                </a></td> <td>CBF</td> <td>PR</td></tr></tbody></table>
+                """
+
+        self.parser.html = BeautifulSoup(html_code, 'html.parser')
+
+        assert self.parser.arbitragem() == {
+            'bandeira': '{{Bandeira|PA}}',
+            'arbitro': {
+                'nome': 'Dewson Fernando Freitas da Silva',
+                'bandeira': None
+            },
+            'aux1': {
+                'nome': 'Cleriston Clay Barreto Rios',
+                'bandeira': '{{Bandeira|SE}}'
+            },
+            'aux2': {
+                'nome': 'Heronildo S Freitas da Silva',
+                'bandeira': None
+            }
+        }
