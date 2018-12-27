@@ -101,10 +101,12 @@ class ParserCBF(object):
 
 
 if __name__ == '__main__':
-    jogos = range(21, 31)
+    serie_name = 'Série B'
+    start = 52
+    jogos = range(start, start + 20)
     ano = 2018
     for jogo in jogos:
-        URL_FINAL = URL.format(2018, jogo)
+        URL_FINAL = URL.format(ano, jogo)
         CONTENT = request.urlopen(URL_FINAL).read()
         SOUP = BeautifulSoup(CONTENT, 'html.parser')
 
@@ -117,10 +119,10 @@ if __name__ == '__main__':
 
         placar = SOUP.find(class_='section-placar')
 
-        dia = placar.find_all('span', class_='text-2')[1].text.strip()
-        dt = strptime(dia, '%A, %d de %B de %Y')
+        dia_mes = placar.find_all('span', class_='text-2')[1].text.strip()
+        dt = strptime(dia_mes, '%A, %d de %B de %Y')
 
-        dia = re.search(r'(\d\d de \w+) de', dia).group(1).lower()
+        dia_mes = re.search(r'(\d\d de \w+) de', dia_mes).group(1).lower()
         hora = placar.find_all('span', class_='text-2')[2].text.strip()
 
         e_c_e = placar.find(class_='col-sm-8').span.text.strip()
@@ -137,24 +139,52 @@ if __name__ == '__main__':
 
         times = placar.find_all('h3', class_='time-nome')
         mandante_nome = times[0].text.split('-')[0].strip()
-        if 'Atlético - MG' in times[0]:
+        if 'Atlético - MG' in times[0].text:
             mandante_nome = 'Atlético-MG'
-        elif 'Atlético - PR' in times[0]:
+        elif 'Atlético - PR' in times[0].text:
             mandante_nome = 'Atlético-PR'
-        elif 'Atlético - GO' in times[0]:
+        elif 'Atlético - GO' in times[0].text:
             mandante_nome = 'Atlético-GO'
-        elif 'América - MG' in times[0]:
+        elif 'América - MG' in times[0].text:
             mandante_nome = 'América-MG'
+        elif 'Paran' in times[0].text:
+            mandante_nome = 'Paraná Clube'
+        elif 'Vasco da Gama' in times[0].text:
+            mandante_nome = 'Vasco'
+        elif 'Correa' in times[0].text:
+            mandante_nome = 'Sampaio Corrêa'
+        elif 'Csa' in times[0].text:
+            mandante_nome = 'CSA'
+        elif 'crb' in times[0].text:
+            mandante_nome = 'CRB'
+        elif 'Brasil' in times[0].text:
+            mandante_nome = 'Brasil de Pelotas'
+        elif 'Boa' in times[0].text:
+            mandante_nome = 'Boa Esporte'
 
         visitante_nome = times[1].text.split('-')[0].strip()
-        if 'Atlético - MG' in times[1]:
+        if 'Atlético - MG' in times[1].text:
             visitante_nome = 'Atlético-MG'
-        elif 'Atlético - PR' in times[1]:
+        elif 'Atlético - PR' in times[1].text:
             visitante_nome = 'Atlético-PR'
-        elif 'Atlético - GO' in times[1]:
+        elif 'Atlético - GO' in times[1].text:
             visitante_nome = 'Atlético-GO'
-        elif 'América - MG' in times[1]:
+        elif 'América - MG' in times[1].text:
             visitante_nome = 'América-MG'
+        elif 'Paran' in times[1].text:
+            visitante_nome = 'Paraná Clube'
+        elif 'Vasco da Gama' in times[1].text:
+            visitante_nome = 'Vasco'
+        elif 'Correa' in times[1].text:
+            visitante_nome = 'Sampaio Corrêa'
+        elif 'Csa' in times[1].text:
+            visitante_nome = 'CSA'
+        elif 'Crb' in times[1].text:
+            visitante_nome = 'CRB'
+        elif 'Brasil' in times[1].text:
+            visitante_nome = 'Brasil de Pelotas'
+        elif 'Boa' in times[1].text:
+            visitante_nome = 'Boa Esporte'
 
         gols = placar.find_all('strong', class_='time-gols')
 
@@ -213,32 +243,38 @@ if __name__ == '__main__':
         rodada = int(jogo / 10)
         rodada += 1 if jogo % 10 != 0 else 0
 
+        mes = str(dt.tm_mon)
+        mes = "0{}".format(mes) if dt.tm_mon < 10 else mes
+
+        dia = str(dt.tm_mday)
+        dia = "0{}".format(dia) if dt.tm_mday < 10 else dia
+
         arquivo_sum_bor = mandante_nome[:3].lower() + \
             visitante_nome[:3].lower() + \
-            str(dt.tm_mday) + str(dt.tm_mon) + str(dt.tm_year)
+            dia + mes + str(dt.tm_year)
 
         out = "{{Ficha" + \
-            "\n| mandante = {} ".format(mandante_nome.strip()) + \
+            "\n| mandante = {}".format(mandante_nome) + \
             "\n| golsmandante = {}".format(gols[1].text) + \
             "\n| visitante = {}".format(visitante_nome) + \
             "\n| golsvisitante = {}".format(gols[2].text) + \
             "\n| rodada = {}ª rodada".format(rodada) + \
-            "\n| motivo = [[Masculino Série A {}|".format(ano) + \
-            "Campeonato Brasileiro {} - Série A]]".format(ano) + \
-            "\n| dia = {}".format(dia) + \
+            "\n| motivo = [[Masculino {} {}|".format(serie_name, ano) + \
+            "Campeonato Brasileiro {} - {}]]".format(ano, serie_name) + \
+            "\n| dia = {}".format(dia_mes) + \
             "\n| ano = {}".format(ano) + \
             "\n| hora = {}".format(hora).replace(':00', 'h') + \
             "\n| bandeira_arbitragem ={}".format(arbitragem['bandeira']) + \
             "\n| arbitro = {}".format(arbitragem['arbitro']['nome'])
 
         if arbitragem['aux1']['bandeira']:
-            out += "\n| bandeira_arbitragem = {}".format(
+            out += "\n| bandeira_auxiliar1 = {}".format(
                 arbitragem['aux1']['bandeira'])
 
         out += "\n| auxiliar1 = {}".format(arbitragem['aux1']['nome'])
 
         if arbitragem['aux2']['bandeira']:
-            out += "\n| bandeira_arbitragem = {}".format(
+            out += "\n| bandeira_auxiliar2 = {}".format(
                 arbitragem['aux2']['bandeira'])
 
         out += "\n| auxiliar2 = {}".format(arbitragem['aux2']['nome']) + \
@@ -394,15 +430,9 @@ if __name__ == '__main__':
         for x in range(1, 5):
             out += mostrar_gols(gols_vis, x, 'Visitante')
 
-        mes = str(dt.tm_mon)
-        mes = "0{}".format(mes) if dt.tm_mon < 10 else mes
-
-        dia = str(dt.tm_mday)
-        dia = "0{}".format(dia) if dt.tm_mday < 10 else dia
-
         out += "}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \
-            "}}\n{{" + "Masculino Série A {}".format(2018) + "}}"
+            "}}\n{{" + "Masculino {} {}".format(serie_name, ano) + "}}"
 
         file_name = str(rodada) + "_" + mandante_nome[:3] + \
             visitante_nome[:3]
@@ -411,21 +441,22 @@ if __name__ == '__main__':
                                                  gols[1].text,
                                                  gols[2].text,
                                                  visitante_nome))
-        out = "{}\n\n\n".format(URL_FINAL) + out
+        link = 'https://brasileiropedia.com/{}_{}x{}_{}_-_{}/{}/{}'.format(
+            mandante_nome.replace(' ', '_'), gols[1].text.strip(),
+            gols[2].text.strip(), visitante_nome.replace(' ', '_'),
+            dia, mes, dt.tm_year)
+        out = "{}\n\n\n{}\n\n\n".format(URL_FINAL, link) + out
         file_path = "./{}_{}.txt".format(file_name, jogo)
         f = open(file_path, 'w')
         f.write(out)
         f.close()
 
-        link_sum_b = 'https://conteudo.cbf.com.br/sumulas/2018/142{}.pdf\n'
+        link_sum_b = 'https://conteudo.cbf.com.br/sumulas/{}/142{}.pdf\n'
 
         f_sum_b = open('sum_bor.list', 'a+')
-        f_sum_b.write(link_sum_b.format(str(jogo) + "se"))
-        f_sum_b.write(link_sum_b.format(str(jogo) + "b"))
+        f_sum_b.write(link_sum_b.format(ano, str(jogo) + "se"))
+        f_sum_b.write(link_sum_b.format(ano, str(jogo) + "b"))
         f_sum_b.close()
 
         print('Salvo em: {}'.format(file_path))
-        print('https://brasileiropedia.com/{}_{}x{}_{}_-_{}/{}/{}'.
-              format(mandante_nome.replace(' ', '_'), gols[1].text.strip(),
-                     gols[2].text.strip(), visitante_nome.replace(' ', '_'),
-                     dia, mes, dt.tm_year))
+        print(link)
