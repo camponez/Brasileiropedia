@@ -9,6 +9,7 @@ from urllib import request
 from bs4 import BeautifulSoup
 
 SERIE = "serie-a/{}/{}"
+# SERIE = "feminino-a1/{}/{}"
 COMPETICAO = "campeonato-brasileiro-{}".format(SERIE)
 
 URL = "https://www.cbf.com.br"
@@ -102,12 +103,18 @@ class ParserCBF(object):
 
 if __name__ == '__main__':
     serie_name = 'Série B'
-    start = 52
-    jogos = range(start, start + 20)
+    genero = 'Masculino '
+    grupo = ''
     ano = 2018
+    start = 131
+    jogos = range(start, start + 30)
     for jogo in jogos:
         URL_FINAL = URL.format(ano, jogo)
-        CONTENT = request.urlopen(URL_FINAL).read()
+        try:
+            CONTENT = request.urlopen(URL_FINAL).read()
+        except BaseException:
+            print("Pulou {}".format(jogo))
+            continue
         SOUP = BeautifulSoup(CONTENT, 'html.parser')
 
         PARSER = ParserCBF()
@@ -134,63 +141,69 @@ if __name__ == '__main__':
             estadio = 'Manoel Barreto'
             cidade = 'Ceará-Mirim'
             estado = 'RN'
+        elif 'Eco-Estádio'.lower() in e_c_e.lower():
+            estadio = 'Eco-Estádio'
+            cidade = 'Curitiba'
+            estado = 'PR'
+        elif 'Ismael Benigno'.lower() in e_c_e.lower():
+            estadio = 'Ismael Benigno'
+            cidade = 'Colina'
+            estado = 'AM'
+        elif 'Bezerrão'.lower() in e_c_e.lower():
+            estadio = 'Bezerrão'
+            cidade = 'Valmir Campelo Bezerro'
+            estado = 'DF'
         else:
             estadio, cidade, estado = e_c_e.split('-')
 
         times = placar.find_all('h3', class_='time-nome')
-        mandante_nome = times[0].text.split('-')[0].strip()
-        if 'Atlético - MG' in times[0].text:
-            mandante_nome = 'Atlético-MG'
-        elif 'Atlético - PR' in times[0].text:
-            mandante_nome = 'Atlético-PR'
-        elif 'Atlético - GO' in times[0].text:
-            mandante_nome = 'Atlético-GO'
-        elif 'América - MG' in times[0].text:
-            mandante_nome = 'América-MG'
-        elif 'Paran' in times[0].text:
-            mandante_nome = 'Paraná Clube'
-        elif 'Vasco da Gama' in times[0].text:
-            mandante_nome = 'Vasco'
-        elif 'Correa' in times[0].text:
-            mandante_nome = 'Sampaio Corrêa'
-        elif 'Csa' in times[0].text:
-            mandante_nome = 'CSA'
-        elif 'crb' in times[0].text:
-            mandante_nome = 'CRB'
-        elif 'Brasil' in times[0].text:
-            mandante_nome = 'Brasil de Pelotas'
-        elif 'Boa' in times[0].text:
-            mandante_nome = 'Boa Esporte'
 
-        visitante_nome = times[1].text.split('-')[0].strip()
-        if 'Atlético - MG' in times[1].text:
-            visitante_nome = 'Atlético-MG'
-        elif 'Atlético - PR' in times[1].text:
-            visitante_nome = 'Atlético-PR'
-        elif 'Atlético - GO' in times[1].text:
-            visitante_nome = 'Atlético-GO'
-        elif 'América - MG' in times[1].text:
-            visitante_nome = 'América-MG'
-        elif 'Paran' in times[1].text:
-            visitante_nome = 'Paraná Clube'
-        elif 'Vasco da Gama' in times[1].text:
-            visitante_nome = 'Vasco'
-        elif 'Correa' in times[1].text:
-            visitante_nome = 'Sampaio Corrêa'
-        elif 'Csa' in times[1].text:
-            visitante_nome = 'CSA'
-        elif 'Crb' in times[1].text:
-            visitante_nome = 'CRB'
-        elif 'Brasil' in times[1].text:
-            visitante_nome = 'Brasil de Pelotas'
-        elif 'Boa' in times[1].text:
-            visitante_nome = 'Boa Esporte'
+        def fix_nome(nome):
+            r_out = nome.split('-')[0].strip()
+            if 'Atlético - MG' in nome:
+                r_out = 'Atlético-MG'
+            elif 'Atlético - PR' in nome:
+                r_out = 'Atlético-PR'
+            elif 'Atletico - PR' in nome:
+                r_out = 'Atlético-PR'
+            elif 'Atlético - GO' in nome:
+                r_out = 'Atlético-GO'
+            elif 'Botafogo - PB' in nome:
+                r_out = 'Botafogo-PB'
+            elif 'América - MG' in nome:
+                r_out = 'América-MG'
+            elif 'Vitória - PE' in nome:
+                r_out = 'Vitória-PE'
+            elif 'Paran' in nome:
+                r_out = 'Paraná Clube'
+            elif 'Vasco da Gama' in nome:
+                r_out = 'Vasco'
+            elif 'Correa' in nome:
+                r_out = 'Sampaio Corrêa'
+            elif 'Csa' in nome:
+                r_out = 'CSA'
+            elif 'crb' in nome.lower():
+                r_out = 'CRB'
+            elif 'Brasil' in nome:
+                r_out = 'Brasil de Pelotas'
+            elif 'Boa' in nome:
+                r_out = 'Boa Esporte'
+
+            return r_out
+
+        mandante_nome = fix_nome(times[0].text)
+        visitante_nome = fix_nome(times[1].text)
 
         gols = placar.find_all('strong', class_='time-gols')
 
         def players(l_players):
-            time = {'titular': [], 'reserva': [], 'banco': [], 'amarelo': [],
-                    'vermelho': [], 'gols': []}
+            time = {
+                'titular': [],
+                'reserva': [],
+                'banco': [],
+                'amarelo': [],
+                'vermelho': [],
+                'gols': []}
             parser = ParserCBF()
 
             for player in l_players.find_all('li'):
@@ -258,9 +271,8 @@ if __name__ == '__main__':
             "\n| golsmandante = {}".format(gols[1].text) + \
             "\n| visitante = {}".format(visitante_nome) + \
             "\n| golsvisitante = {}".format(gols[2].text) + \
-            "\n| rodada = {}ª rodada".format(rodada) + \
-            "\n| motivo = [[Masculino {} {}|".format(serie_name, ano) + \
-            "Campeonato Brasileiro {} - {}]]".format(ano, serie_name) + \
+            "\n| rodada = {}ª rodada{}".format(rodada, grupo) + \
+            "\n| motivo = {}".format(serie_name) + \
             "\n| dia = {}".format(dia_mes) + \
             "\n| ano = {}".format(ano) + \
             "\n| hora = {}".format(hora).replace(':00', 'h') + \
@@ -409,7 +421,8 @@ if __name__ == '__main__':
             out += "\n|+sep=;\n"
 
         gols_man = {i: mandante['gols'].count(i) for i in mandante['gols']}
-        gols_vis = {i: visitante['gols'].count(i) for i in visitante['gols']}
+        gols_vis = {i: visitante['gols'].count(
+            i) for i in visitante['gols']}
 
         def mostrar_gols(gols_j, num, m_v):
             r_out = "\n|Gol{}{}=".format(num, m_v)
@@ -432,7 +445,7 @@ if __name__ == '__main__':
 
         out += "}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \
-            "}}\n{{" + "Masculino {} {}".format(serie_name, ano) + "}}"
+            "}}\n{{" + "{} {} {}".format(genero, serie_name, ano) + "}}"
 
         file_name = str(rodada) + "_" + mandante_nome[:3] + \
             visitante_nome[:3]
@@ -446,7 +459,7 @@ if __name__ == '__main__':
             gols[2].text.strip(), visitante_nome.replace(' ', '_'),
             dia, mes, dt.tm_year)
         out = "{}\n\n\n{}\n\n\n".format(URL_FINAL, link) + out
-        file_path = "./{}_{}.txt".format(file_name, jogo)
+        file_path = "./{}/{}_{}.txt".format(ano, jogo, file_name)
         f = open(file_path, 'w')
         f.write(out)
         f.close()
