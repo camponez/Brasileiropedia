@@ -8,7 +8,7 @@ from time import strptime
 from urllib import request
 from bs4 import BeautifulSoup
 
-SERIE = "serie-a/{}/{}"
+SERIE = "serie-b/{}/{}"
 # SERIE = "feminino-a1/{}/{}"
 COMPETICAO = "campeonato-brasileiro-{}".format(SERIE)
 
@@ -56,7 +56,7 @@ class ParserCBF(object):
         return not self.reserva()
 
     def reserva(self):
-        return self.__html.has_attr('class')
+        return self.html.has_attr('class')
 
     def gols(self):
         return len(self.__html.find_all('ellipse'))
@@ -71,25 +71,41 @@ class ParserCBF(object):
             return False
         return 'icon-red-card' in self.__html.i.get('class')
 
+    def linha(self, mand=True):
+        r_out = '{{'
+        r_out += 'Titular' if self.titular() else 'Reserva'
+        r_out += 'Mandante' if mand else 'Visitante'
+        r_out += '|{}|{}'.format(self.player_full_name(), self.player_name())
+        r_out += '|num={}'.format(
+            self.player_number()) if not self.titular() else ''
+        r_out += '|amar1=1' if self.amarelo() else ''
+        r_out += '|verm=1' if self.vermelho() else ''
+        for gol in range(0, self.gols()):
+            r_out += '|gol{}=1'.format(gol+1)
+
+        return r_out + '}}'
+
     def arbitragem(self):
 
-        band = self.__html[2].text.strip()
-        band2 = self.__html[5].text.strip()
-        band3 = self.__html[8].text.strip()
+        html = self.__html.find('table').find_all('td')
+
+        band = html[2].text.strip()
+        band2 = html[5].text.strip()
+        band3 = html[8].text.strip()
 
         arbitros = {
             'bandeira': "{{Bandeira|" + band + "}}",
             'arbitro': {
-                'nome': self.__html[0].text.strip(),
+                'nome': html[0].text.strip(),
                 'bandeira': None},
             'aux1': {
-                'nome': self.__html[3].text.strip(),
-                'bandeira': None if band2 == band
-                else "{{Bandeira|" + band2 + "}}"},
+                'nome': html[3].text.strip(),
+                'bandeira': None if band2 == band else "{{Bandeira|" + \
+                band2 + "}}"},
             'aux2': {
-                'nome': self.__html[6].text.strip(),
-                'bandeira': None if band3 == band else
-                "{{Bandeira|" + band3 + "}}"}
+                'nome': html[6].text.strip(),
+                'bandeira': None if band3 == band else "{{Bandeira|" + \
+                band3 + "}}"}
         }
 
         return arbitros
@@ -106,8 +122,8 @@ if __name__ == '__main__':
     genero = 'Masculino '
     grupo = ''
     ano = 2018
-    start = 131
-    jogos = range(start, start + 30)
+    start = 133
+    jogos = range(start, start + 1)
     for jogo in jogos:
         URL_FINAL = URL.format(ano, jogo)
         try:
@@ -121,7 +137,7 @@ if __name__ == '__main__':
         PLAYERS = SOUP.find(
             class_='jogo-escalacao').find_all(class_='col-xs-6')
 
-        PARSER.html = SOUP.find('table').find_all('td')
+        PARSER.html = SOUP
         arbitragem = PARSER.arbitragem()
 
         placar = SOUP.find(class_='section-placar')
@@ -196,46 +212,29 @@ if __name__ == '__main__':
 
         gols = placar.find_all('strong', class_='time-gols')
 
-        def players(l_players):
+        def players(l_players, mandante):
             time = {
-                'titular': [],
-                'reserva': [],
-                'banco': [],
-                'amarelo': [],
-                'vermelho': [],
-                'gols': []}
+                'jogador': [],
+                'banco': []
+            }
             parser = ParserCBF()
 
             for player in l_players.find_all('li'):
                 parser.html = player
-                info = {'num': parser.player_number(),
-                        'nome': parser.player_name(),
-                        'nome_completo': parser.player_full_name(),
-                        'amarelo': None,
-                        'vermelho': None,
-                        'gols': parser.gols(),
-                        'reserva': None}
-                time['gols'] += [parser.player_full_name()] * parser.gols()
-
-                if parser.amarelo():
-                    info['amarelo'] = True
-                    time['amarelo'].append(info)
-
-                if parser.vermelho():
-                    info['vermelho'] = True
-                    time['vermelho'].append(info)
-
-                if parser.titular():
-                    time['titular'].append(info)
-
+                info = {
+                    'num': parser.player_number(),
+                    'nome': parser.linha(mandante),
+                    'reserva': None
+                }
                 if parser.reserva():
-                    time['reserva'].append(info)
-                    time['titular'][-1]['reserva'] = info
+                    time['jogador'][-1]['reserva'] = info
+                else:
+                    time['jogador'].append(info)
 
             return time
 
-        mandante = players(PLAYERS[0])
-        visitante = players(PLAYERS[1])
+        mandante = players(PLAYERS[0], True)
+        visitante = players(PLAYERS[1], False)
 
         for i_player in PLAYERS[2].find_all('li'):
             PARSER.html = i_player
@@ -299,65 +298,26 @@ if __name__ == '__main__':
             "\n| sumula = {{" + \
             "cbf_sumula|arquivo={}".format(arquivo_sum_bor) + \
             "}}"
-        i = 1
-        for player in mandante['titular']:
-            out += "\n| n{}.1 = {}".format(i, player['num'])
-            out += "\n| j{}.1 = [[{}|{}]]".format(
-                i, player['nome_completo'], player['nome'])
-            out += " {{gol|}}" * player['gols']
 
-            if player['amarelo']:
-                out += " {{amar|}}"
+        def add_player(l_players, t_or_r):
+            index = 1
+            r_out = ''
+            for play in l_players:
+                num = play['num']
+                nome = play['nome']
+                reserva = play['reserva']
 
-            if player['vermelho']:
-                out += " {{verm|}}"
+                r_out += "\n| n{}.{} = {}".format(index, t_or_r, num)
+                r_out += "\n| j{}.{} = {}".format(index, t_or_r, nome)
+                r_out += " " + reserva['nome'] if reserva else ''
 
-            if player['reserva']:
-                out += " {{subs|" + "{}. [[{}|{}]]".format(
-                    player['reserva']['num'],
-                    player['reserva']['nome_completo'],
-                    player['reserva']['nome'])
-                out += " {{gol|}}" * player['reserva']['gols']
+                index += 1
+            return r_out
 
-                if player['reserva']['amarelo']:
-                    out += " {{amar|}}"
-                if player['reserva']['vermelho']:
-                    out += " {{verm|}}"
-
-                out += "| }}"
-            i += 1
-
+        out += add_player(mandante['jogador'], 1)
         out += "\n| tec1 = \n"
 
-        i = 1
-        for player in visitante['titular']:
-            out += "\n| n{}.2 = {}".format(i, player['num'])
-            out += "\n| j{}.2 = [[{}|{}]]".format(
-                i, player['nome_completo'], player['nome'])
-
-            out += " {{gol|}}" * player['gols']
-
-            if player['amarelo']:
-                out += " {{amar}}"
-
-            if player['vermelho']:
-                out += " {{verm}}"
-
-            if player['reserva']:
-                out += " {{subs|" + "{}. [[{}|{}]]".format(
-                    player['reserva']['num'],
-                    player['reserva']['nome_completo'],
-                    player['reserva']['nome'])
-
-                out += " {{gol|}}" * player['reserva']['gols']
-                if player['reserva']['amarelo']:
-                    out += " {{amar}}"
-                if player['reserva']['vermelho']:
-                    out += " {{verm}}"
-
-                out += "| }}"
-            i += 1
-
+        out += add_player(visitante['jogador'], 2)
         out += "\n| tec2 = \n"
 
         i = 12
@@ -376,72 +336,6 @@ if __name__ == '__main__':
                                                  player['nome'])
             i += 1
 
-        out += "\n}}\n\n\n{{#set:\nTitularMandante="
-        for i in mandante['titular']:
-            out += "\n{};".format(i['nome_completo'])
-        out += "\n|+sep=;"
-
-        out += "\n\n|ReservaMandante="
-        for i in mandante['reserva']:
-            out += "\n{};".format(i['nome_completo'])
-        out += "\n|+sep=;"
-
-        out += "\n\n|TitularVisitante="
-        for i in visitante['titular']:
-            out += "\n{};".format(i['nome_completo'])
-        out += "\n|+sep=;"
-
-        out += "\n\n|ReservaVisitante="
-        for i in visitante['reserva']:
-            out += "\n{};".format(i['nome_completo'])
-        out += "\n|+sep=;"
-
-        if mandante['amarelo']:
-            out += "\n\n|Amarelo1Mandante="
-            for i in mandante['amarelo']:
-                out += "\n{};".format(i['nome_completo'])
-            out += "\n|+sep=;\n"
-
-        if visitante['amarelo']:
-            out += "\n\n|Amarelo1Visitante="
-            for i in visitante['amarelo']:
-                out += "\n{};".format(i['nome_completo'])
-            out += "\n|+sep=;\n"
-
-        if mandante['vermelho']:
-            out += "\n\n|VermelhoMandante="
-            for i in mandante['vermelho']:
-                out += "\n{};".format(i['nome_completo'])
-            out += "\n|+sep=;"
-
-        if visitante['vermelho']:
-            out += "\n\n|VermelhoVisitante="
-            for i in visitante['vermelho']:
-                out += "\n{};".format(i['nome_completo'])
-            out += "\n|+sep=;\n"
-
-        gols_man = {i: mandante['gols'].count(i) for i in mandante['gols']}
-        gols_vis = {i: visitante['gols'].count(
-            i) for i in visitante['gols']}
-
-        def mostrar_gols(gols_j, num, m_v):
-            r_out = "\n|Gol{}{}=".format(num, m_v)
-            r_pl = ''
-            for key in gols_j:
-                if gols_j[key] >= num:
-                    r_pl += '\n{};'.format(key)
-
-            if not r_pl:
-                return ''
-
-            r_out += "{}\n|+sep=;\n".format(r_pl)
-            return r_out
-
-        for x in range(1, 5):
-            out += mostrar_gols(gols_man, x, 'Mandante')
-
-        for x in range(1, 5):
-            out += mostrar_gols(gols_vis, x, 'Visitante')
 
         out += "}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \

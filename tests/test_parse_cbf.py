@@ -37,6 +37,40 @@ class TestCBFParse(object):
     def test_no_vermelho(self):
         assert not self.parser.vermelho()
 
+    def test_linha_jogador(self):
+        assert self.parser.linha() == ('{{TitularMandante|Egidio de Araujo '
+                                       'Pereira Junior|Egidio}}')
+
+        assert self.parser.linha(False) == ('{{TitularVisitante|'
+                                            'Egidio de Araujo '
+                                            'Pereira Junior|Egidio}}')
+
+    def test_linha_jogador_reserva(self):
+        html_code = (
+            """
+            <li class="p-l-30">
+            <span class="list-number pull-left p-t-15 m-r-10
+            w-20">45</span> <strong class="block list-title p-b-5">
+                          Welison
+                                                      <i class="icon
+                                                      pull-right"><svg
+            width="26" height="21" viewBox="0 0 26 21"
+            xmlns="https://www.w3.org/2000/svg"><path d="M16 9h-5l8-9 7
+            9h-5v11h-5V9z" fill="#399C00"></path></svg></i></strong> <span
+            class="list-desc">José Welison da Silva</span></li>
+            """
+        )
+        self.parser.html = BeautifulSoup(html_code,
+                                         'html.parser').find_all('li')[0]
+
+        assert self.parser.linha() == ('{{ReservaMandante|'
+                                       'José Welison da Silva'
+                                       '|Welison|num=45}}')
+
+        assert self.parser.linha(False) == ('{{ReservaVisitante|'
+                                            'José Welison da Silva'
+                                            '|Welison|num=45}}')
+
     def test_amarelo(self):
         html_code = (
             '<li>'
@@ -60,9 +94,16 @@ class TestCBFParse(object):
         self.parser.html = BeautifulSoup(html_code, 'html.parser')
 
         assert self.parser.amarelo()
+        assert self.parser.linha() == ('{{TitularMandante|'
+                                       'Alejandro Ariel Cabral'
+                                       '|Ariel Cabral'
+                                       '|amar1=1'
+                                       '}}')
 
     def test_vermelho(self):
         html_code = (
+            '<li>'
+            '<span class="list-number pull-left p-t-15 m-r-10 w-20">5</span>'
             '<strong class="block list-title p-b-5">'
             '              Rhodolfo'
             '                              <i class="icon small'
@@ -70,9 +111,15 @@ class TestCBFParse(object):
             'pull-right"><svg width="26" height="21" viewBox="0 0 26 21"'
             'xmlns="https://www.w3.org/2000/svg"><path d="M16 9h-5l8-9 7'
             '9h-5v11h-5V9z" fill="#399C00"></path></svg></i></strong>'
+            '<span class="list-desc">Rhodolfo Silva</span>'
+            '</li>'
         )
 
         self.parser.html = BeautifulSoup(html_code, 'html.parser')
+        assert self.parser.linha(False) == ('{{TitularVisitante|'
+                                            'Rhodolfo Silva|Rhodolfo'
+                                            '|verm=1'
+                                            '}}')
 
         assert self.parser.vermelho()
 
