@@ -337,7 +337,7 @@ if __name__ == '__main__':
             i += 1
 
 
-        out += "}}\n\n{{DEFAULTSORT: " + " {}".format(
+        out += "\n}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \
             "}}\n{{" + "{} {} {}".format(genero, serie_name, ano) + "}}"
 
