@@ -8,7 +8,7 @@ from time import strptime
 from urllib import request
 from bs4 import BeautifulSoup
 
-SERIE = "serie-b/{}/{}"
+SERIE = "{}/{}/{}"
 # SERIE = "feminino-a1/{}/{}"
 COMPETICAO = "campeonato-brasileiro-{}".format(SERIE)
 
@@ -78,10 +78,10 @@ class ParserCBF(object):
         r_out += '|{}|{}'.format(self.player_full_name(), self.player_name())
         r_out += '|num={}'.format(
             self.player_number()) if not self.titular() else ''
-        r_out += '|amar1=1' if self.amarelo() else ''
-        r_out += '|verm=1' if self.vermelho() else ''
+        r_out += '|amar1=1|tempo_amar1=' if self.amarelo() else ''
+        r_out += '|verm=1|tempo_verm=' if self.vermelho() else ''
         for gol in range(0, self.gols()):
-            r_out += '|gol{}=1'.format(gol+1)
+            r_out += '|gol{}=1|tempo_gol{}='.format(gol + 1, gol + 1)
 
         return r_out + '}}'
 
@@ -100,11 +100,11 @@ class ParserCBF(object):
                 'bandeira': None},
             'aux1': {
                 'nome': html[3].text.strip(),
-                'bandeira': None if band2 == band else "{{Bandeira|" + \
+                'bandeira': None if band2 == band else "{{Bandeira|" +
                 band2 + "}}"},
             'aux2': {
                 'nome': html[6].text.strip(),
-                'bandeira': None if band3 == band else "{{Bandeira|" + \
+                'bandeira': None if band3 == band else "{{Bandeira|" +
                 band3 + "}}"}
         }
 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     start = 133
     jogos = range(start, start + 1)
     for jogo in jogos:
-        URL_FINAL = URL.format(ano, jogo)
+        URL_FINAL = URL.format(serie_path, ano, jogo)
         try:
             CONTENT = request.urlopen(URL_FINAL).read()
         except BaseException:
@@ -336,7 +336,6 @@ if __name__ == '__main__':
                                                  player['nome'])
             i += 1
 
-
         out += "\n}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \
             "}}\n{{" + "{} {} {}".format(genero, serie_name, ano) + "}}"
@@ -353,7 +352,8 @@ if __name__ == '__main__':
             gols[2].text.strip(), visitante_nome.replace(' ', '_'),
             dia, mes, dt.tm_year)
         out = "{}\n\n\n{}\n\n\n".format(URL_FINAL, link) + out
-        file_path = "./{}/{}_{}.txt".format(ano, jogo, file_name)
+        file_path = "./{}/{}/{}_{}.txt".format(serie_path,
+                                               ano, jogo, file_name)
         f = open(file_path, 'w')
         f.write(out)
         f.close()
