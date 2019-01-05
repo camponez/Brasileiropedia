@@ -120,6 +120,7 @@ class ParserCBF(object):
 
 if __name__ == '__main__':
     serie_name = 'Série B'
+    serie_path = 'serie-a'
     genero = 'Masculino '
     grupo = ''
     ano = 2018
