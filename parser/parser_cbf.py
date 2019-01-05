@@ -79,7 +79,7 @@ class ParserCBF(object):
         r_out += '|num={}'.format(
             self.player_number()) if not self.titular() else ''
         r_out += '|tempo=' if not self.titular() else ''
-        r_out += '|amar1=1|tempo_amar1=' if self.amarelo() else ''
+        r_out += '|amar1=1|tempo_amar=' if self.amarelo() else ''
         r_out += '|verm=1|tempo_verm=' if self.vermelho() else ''
         for gol in range(0, self.gols()):
             r_out += '|gol{}=1|tempo_gol{}='.format(gol + 1, gol + 1)

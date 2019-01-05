@@ -98,7 +98,7 @@ class TestCBFParse(object):
                                        'Alejandro Ariel Cabral'
                                        '|Ariel Cabral'
                                        '|amar1=1'
-                                       '|tempo_amar1='
+                                       '|tempo_amar='
                                        '}}')
 
     def test_gol(self):
@@ -127,7 +127,7 @@ class TestCBFParse(object):
         assert self.parser.linha(False) == (
             '{{TitularVisitante|'
             'Giorgian Daniel de Arrascaeta Benedetti|De Arrascaeta'
-            "|amar1=1|tempo_amar1="
+            "|amar1=1|tempo_amar="
             '|gol1=1'
             "|tempo_gol1="
             '}}'
