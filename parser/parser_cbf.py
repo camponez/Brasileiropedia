@@ -184,6 +184,8 @@ if __name__ == '__main__':
                 r_out = 'Atlético-PR'
             elif 'Atletico - PR' in nome:
                 r_out = 'Atlético-PR'
+            elif 'Atlético - AC' in nome:
+                r_out = 'Atlético-AC'
             elif 'Atlético - GO' in nome:
                 r_out = 'Atlético-GO'
             elif 'Botafogo - PB' in nome:
@@ -200,6 +202,8 @@ if __name__ == '__main__':
                 r_out = 'Sampaio Corrêa'
             elif 'Csa' in nome:
                 r_out = 'CSA'
+            elif 'abc' in nome.lower():
+                r_out = 'ABC'
             elif 'crb' in nome.lower():
                 r_out = 'CRB'
             elif 'Brasil' in nome:
