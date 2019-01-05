@@ -65,11 +65,11 @@ class TestCBFParse(object):
 
         assert self.parser.linha() == ('{{ReservaMandante|'
                                        'José Welison da Silva'
-                                       '|Welison|num=45}}')
+                                       '|Welison|num=45|tempo=}}')
 
         assert self.parser.linha(False) == ('{{ReservaVisitante|'
                                             'José Welison da Silva'
-                                            '|Welison|num=45}}')
+                                            '|Welison|num=45|tempo=}}')
 
     def test_amarelo(self):
         html_code = (
