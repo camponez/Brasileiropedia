@@ -35,7 +35,22 @@ class ParserCBF(object):
         self.__html = value
 
     def player_name(self):
-        return self.__html.find(class_='block').text.strip().title()
+        name = self.__html.find(class_='block').text.strip().title()
+        return self.replace_name(name)
+
+    def replace_name(self, name):
+        name = name.replace(' De ', ' de ')
+        name = name.replace(' Da ', ' da ')
+        name = name.replace(' E ', ' e ')
+        name = name.replace(' Dos ', ' dos ')
+        name = name.replace(' Do ', ' do ')
+        name = name.replace('Junior', 'Júnior')
+        name = name.replace('Antonio', 'Antônio')
+        name = name.replace('Cesar', 'César')
+        name = name.replace('Julio', 'Júlio')
+        name = name.replace('Fabio', 'Fábio')
+        name = name.replace('Jose', 'José')
+        return name
 
     def player_number(self):
         try:
@@ -45,12 +60,7 @@ class ParserCBF(object):
 
     def player_full_name(self):
         full_name = self.__html.find(class_='list-desc').text.strip().title()
-        full_name = full_name.replace(' De ', ' de ')
-        full_name = full_name.replace(' Da ', ' da ')
-        full_name = full_name.replace(' E ', ' e ')
-        full_name = full_name.replace(' Dos ', ' dos ')
-        full_name = full_name.replace(' Do ', ' do ')
-        return full_name
+        return self.replace_name(full_name)
 
     def titular(self):
         return not self.reserva()

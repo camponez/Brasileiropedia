@@ -23,7 +23,7 @@ class TestCBFParse(object):
 
     def test_player_full_name(self):
         assert self.parser.player_full_name() == \
-            "Egidio de Araujo Pereira Junior"
+            "Egidio de Araujo Pereira Júnior"
 
     def test_titular(self):
         assert self.parser.titular()
@@ -39,11 +39,11 @@ class TestCBFParse(object):
 
     def test_linha_jogador(self):
         assert self.parser.linha() == ('{{TitularMandante|Egidio de Araujo '
-                                       'Pereira Junior|Egidio}}')
+                                       'Pereira Júnior|Egidio}}')
 
         assert self.parser.linha(False) == ('{{TitularVisitante|'
                                             'Egidio de Araujo '
-                                            'Pereira Junior|Egidio}}')
+                                            'Pereira Júnior|Egidio}}')
 
     def test_linha_jogador_reserva(self):
         html_code = (
@@ -57,7 +57,7 @@ class TestCBFParse(object):
             width="26" height="21" viewBox="0 0 26 21"
             xmlns="https://www.w3.org/2000/svg"><path d="M16 9h-5l8-9 7
             9h-5v11h-5V9z" fill="#399C00"></path></svg></i></strong> <span
-            class="list-desc">José Welison da Silva</span></li>
+            class="list-desc">Jose Welison da Silva</span></li>
             """
         )
         self.parser.html = BeautifulSoup(html_code,
