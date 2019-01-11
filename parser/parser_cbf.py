@@ -294,7 +294,7 @@ if __name__ == '__main__':
             "\n| motivo = {}".format(serie_name) + \
             "\n| dia = {}".format(dia_mes) + \
             "\n| ano = {}".format(ano) + \
-            "\n| hora = {}".format(hora).replace(':00', 'h') + \
+            "\n| hora = {}".format(hora) + \
             "\n| bandeira_arbitragem ={}".format(arbitragem['bandeira']) + \
             "\n| arbitro = {}".format(arbitragem['arbitro']['nome'])
 
