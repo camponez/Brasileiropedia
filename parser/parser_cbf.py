@@ -236,6 +236,8 @@ if __name__ == '__main__':
                 r_out = 'Paraná Clube'
             elif 'Vasco da Gama' in nome:
                 r_out = 'Vasco'
+            elif 'Novoperario' in nome:
+                r_out = 'Novo'
             elif 'Correa' in nome:
                 r_out = 'Sampaio Corrêa'
             elif 'Csa' in nome:
