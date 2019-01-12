@@ -194,18 +194,44 @@ if __name__ == '__main__':
                 r_out = 'Atlético-PR'
             elif 'Atletico - PR' in nome:
                 r_out = 'Atlético-PR'
+            elif 'Atletico - ES' in nome:
+                r_out = 'Atlético-ES'
+            elif 'a.s.s.u.' in nome.lower():
+                r_out = 'ASSU'
             elif 'Atlético - AC' in nome:
                 r_out = 'Atlético-AC'
             elif 'Guarani - MG' in nome:
                 r_out = 'Guarani-MG'
+            elif 'Bare' in nome:
+                r_out = 'Baré'
             elif 'Atlético - GO' in nome:
                 r_out = 'Atlético-GO'
+            elif 'Independente - PA' in nome:
+                r_out = 'Independente-PA'
             elif 'Botafogo - PB' in nome:
                 r_out = 'Botafogo-PB'
             elif 'América - MG' in nome:
                 r_out = 'América-MG'
             elif 'Vitória - PE' in nome:
                 r_out = 'Vitória-PE'
+            elif 'Flamengo - PE' in nome:
+                r_out = 'Flamengo-PE'
+            elif 'Maringá' in nome:
+                r_out = 'Maringá'
+            elif 'Nacional - AM' in nome:
+                r_out = 'Nacional-AM'
+            elif 'Ipora' in nome:
+                r_out = 'Iporá'
+            elif 'urt' in nome.lower():
+                r_out = 'URT'
+            elif 'Fluminense de Feira' in nome:
+                r_out = 'Fluminense-BA'
+            elif 'São Raimundo - PA' in nome:
+                r_out = 'São Raimundo-PA'
+            elif 'São Raimundo - RR' in nome:
+                r_out = 'São Raimundo-RR'
+            elif 'Asa -' in nome:
+                r_out = 'ASA'
             elif 'Paran' in nome:
                 r_out = 'Paraná Clube'
             elif 'Vasco da Gama' in nome:
@@ -220,7 +246,7 @@ if __name__ == '__main__':
                 r_out = 'ABC'
             elif 'crb' in nome.lower():
                 r_out = 'CRB'
-            elif 'Brasil' in nome:
+            elif 'Brasil de' in nome:
                 r_out = 'Brasil de Pelotas'
             elif 'Boa' in nome:
                 r_out = 'Boa Esporte'
@@ -294,7 +320,7 @@ if __name__ == '__main__':
             "\n| motivo = {}".format(serie_name) + \
             "\n| dia = {}".format(dia_mes) + \
             "\n| ano = {}".format(ano) + \
-            "\n| hora = {}".format(hora).replace(':00', 'h') + \
+            "\n| hora = {}".format(hora) + \
             "\n| bandeira_arbitragem ={}".format(arbitragem['bandeira']) + \
             "\n| arbitro = {}".format(arbitragem['arbitro']['nome'])
 
