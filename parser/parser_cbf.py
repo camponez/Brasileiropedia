@@ -89,10 +89,10 @@ class ParserCBF(object):
         r_out += '|num={}'.format(
             self.player_number()) if not self.titular() else ''
         r_out += '|tempo=' if not self.titular() else ''
-        r_out += '|amar1=1|tempo_amar=' if self.amarelo() else ''
-        r_out += '|verm=1|tempo_verm=' if self.vermelho() else ''
+        r_out += '|amar1=1' if self.amarelo() else ''
+        r_out += '|verm=1' if self.vermelho() else ''
         for gol in range(0, self.gols()):
-            r_out += '|gol{}=1|tempo_gol{}='.format(gol + 1, gol + 1)
+            r_out += '|gol{}=1'.format(gol + 1)
 
         return r_out + '}}'
 
@@ -202,6 +202,10 @@ if __name__ == '__main__':
                 r_out = 'Atlético-AC'
             elif 'Guarani - MG' in nome:
                 r_out = 'Guarani-MG'
+            elif 'Santos - AP' in nome:
+                r_out = 'Santos-AP'
+            elif 'Barcelona - RO' in nome:
+                r_out = 'Barcelona-RO'
             elif 'Bare' in nome:
                 r_out = 'Baré'
             elif 'Atlético - GO' in nome:
@@ -212,6 +216,8 @@ if __name__ == '__main__':
                 r_out = 'Botafogo-PB'
             elif 'América - MG' in nome:
                 r_out = 'América-MG'
+            elif 'América - RN' in nome:
+                r_out = 'América-RN'
             elif 'Vitória - PE' in nome:
                 r_out = 'Vitória-PE'
             elif 'Flamengo - PE' in nome:
@@ -222,8 +228,14 @@ if __name__ == '__main__':
                 r_out = 'Nacional-AM'
             elif 'Ipora' in nome:
                 r_out = 'Iporá'
+            elif 'Peixe da Amazônia' in nome:
+                r_out = 'Santos-AP'
+            elif 'Independente de Tucurui' in nome:
+                r_out = 'Independente-AP'
             elif 'urt' in nome.lower():
                 r_out = 'URT'
+            elif 'Macapa' in nome:
+                r_out = 'Macapá'
             elif 'Fluminense de Feira' in nome:
                 r_out = 'Fluminense-BA'
             elif 'São Raimundo - PA' in nome:
@@ -238,6 +250,8 @@ if __name__ == '__main__':
                 r_out = 'Vasco'
             elif 'Novoperario' in nome:
                 r_out = 'Novo'
+            elif 'Rio Branco - AC' in nome:
+                r_out = 'Rio Branco-AC'
             elif 'Correa' in nome:
                 r_out = 'Sampaio Corrêa'
             elif 'Csa' in nome:
