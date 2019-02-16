@@ -214,6 +214,10 @@ if __name__ == '__main__':
                 r_out = 'Independente-PA'
             elif 'Botafogo - PB' in nome:
                 r_out = 'Botafogo-PB'
+            elif 'Operario - PR' in nome:
+                r_out = 'Operário-PR'
+            elif 'Botafogo - SP' in nome:
+                r_out = 'Botafogo-SP'
             elif 'América - MG' in nome:
                 r_out = 'América-MG'
             elif 'América - RN' in nome:
@@ -231,7 +235,7 @@ if __name__ == '__main__':
             elif 'Peixe da Amazônia' in nome:
                 r_out = 'Santos-AP'
             elif 'Independente de Tucurui' in nome:
-                r_out = 'Independente-AP'
+                r_out = 'Independente-PA'
             elif 'urt' in nome.lower():
                 r_out = 'URT'
             elif 'Macapa' in nome:
@@ -262,7 +266,7 @@ if __name__ == '__main__':
                 r_out = 'ABC'
             elif 'crb' in nome.lower():
                 r_out = 'CRB'
-            elif 'Brasil de' in nome:
+            elif 'Brasil de' in nome or 'Brasil - RS' in nome:
                 r_out = 'Brasil de Pelotas'
             elif 'Boa' in nome:
                 r_out = 'Boa Esporte'
@@ -360,6 +364,9 @@ if __name__ == '__main__':
             "\n| sumula = {{" + \
             "cbf_sumula|arquivo={}".format(arquivo_sum_bor) + \
             "}}"
+
+        if 'Feminino' in genero:
+            out += "\n| feminino=1"
 
         def add_player(l_players, t_or_r):
             index = 1
