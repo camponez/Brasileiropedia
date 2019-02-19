@@ -214,6 +214,8 @@ if __name__ == '__main__':
                 r_out = 'Independente-PA'
             elif 'Botafogo - PB' in nome:
                 r_out = 'Botafogo-PB'
+            elif 'Ríver - PI' in nome:
+                r_out = 'Ríver-PI'
             elif 'Operario - PR' in nome:
                 r_out = 'Operário-PR'
             elif 'Botafogo - SP' in nome:
