@@ -8,17 +8,13 @@ from time import strptime
 from urllib import request
 from bs4 import BeautifulSoup
 
-SERIE = "{}/{}/{}"
-# SERIE = "feminino-a1/{}/{}"
-COMPETICAO = "campeonato-brasileiro-{}".format(SERIE)
-
 URL = "https://www.cbf.com.br"
-URL += "/futebol-brasileiro/competicoes/{}".format(COMPETICAO)
+URL += "/futebol-brasileiro/competicoes/"
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 
-class ParserCBF(object):
+class ParserCBF():
 
     """Parser para site CBF"""
 
@@ -111,11 +107,12 @@ class ParserCBF(object):
                 'bandeira': None},
             'aux1': {
                 'nome': html[3].text.strip(),
-                'bandeira': None if band2 == band else "{{Bandeira|" +
-                band2 + "}}"},
+                'bandeira': None if band2 == band else "{{Bandeira|" + \
+                band2 + "}}"
+            },
             'aux2': {
                 'nome': html[6].text.strip(),
-                'bandeira': None if band3 == band else "{{Bandeira|" +
+                'bandeira': None if band3 == band else "{{Bandeira|" + \
                 band3 + "}}"}
         }
 
@@ -127,25 +124,43 @@ class ParserCBF(object):
         """
         pass
 
+class Masculino(ParserCBF):
+
+    competicao = "campeonato-brasileiro-{}/{}/{}"
+    genero = 'Masculino '
+
+    def __init__(self, serie_path, ano, n_jogo, serie_name):
+        ParserCBF.__init__(self)
+        self.url = URL + self.competicao.format(serie_path, ano, n_jogo)
+        self.serie_name = serie_name
+        self.serie_path = serie_path
+        self.ano = ano
+
+class Feminino(ParserCBF):
+
+    competicao = "campeonato-brasileiro-feminino-{}/{}/{}"
+    genero = 'Feminino '
+
+    def __init__(self, ano, n_jogo, serie_name, serie):
+        ParserCBF.__init__(self)
+        self.url = URL + self.competicao.format(serie, ano, n_jogo)
+        self.serie_name = serie_name
+
 
 if __name__ == '__main__':
-    serie_name = 'Série B'
-    serie_path = 'serie-a'
-    genero = 'Masculino '
     grupo = ''
-    ano = 2018
-    start = 133
-    jogos = range(start, start + 1)
-    for jogo in jogos:
-        URL_FINAL = URL.format(serie_path, ano, jogo)
+    start = 102
+    JOGOS = range(start, start + 10)
+    for jogo in JOGOS:
+        PARSER = Masculino('serie-d', 2018, jogo, 'Série D')
+        # PARSER = Feminino('serie-d', 2018, jogo, 'Série D')
         try:
-            CONTENT = request.urlopen(URL_FINAL).read()
+            CONTENT = request.urlopen(PARSER.url).read()
         except BaseException:
             print("Pulou {}".format(jogo))
             continue
         SOUP = BeautifulSoup(CONTENT, 'html.parser')
 
-        PARSER = ParserCBF()
         PLAYERS = SOUP.find(
             class_='jogo-escalacao').find_all(class_='col-xs-6')
 
@@ -339,9 +354,9 @@ if __name__ == '__main__':
             "\n| visitante = {}".format(visitante_nome) + \
             "\n| golsvisitante = {}".format(gols[2].text) + \
             "\n| rodada = {}ª rodada{}".format(rodada, grupo) + \
-            "\n| motivo = {}".format(serie_name) + \
+            "\n| motivo = {}".format(PARSER.serie_name) + \
             "\n| dia = {}".format(dia_mes) + \
-            "\n| ano = {}".format(ano) + \
+            "\n| ano = {}".format(PARSER.ano) + \
             "\n| hora = {}".format(hora) + \
             "\n| bandeira_arbitragem ={}".format(arbitragem['bandeira']) + \
             "\n| arbitro = {}".format(arbitragem['arbitro']['nome'])
@@ -367,7 +382,7 @@ if __name__ == '__main__':
             "cbf_sumula|arquivo={}".format(arquivo_sum_bor) + \
             "}}"
 
-        if 'Feminino' in genero:
+        if 'Feminino' in PARSER.genero:
             out += "\n| feminino=1"
 
         def add_player(l_players, t_or_r):
@@ -409,7 +424,8 @@ if __name__ == '__main__':
 
         out += "\n}}\n\n{{DEFAULTSORT: " + " {}".format(
             '-'.join([str(dt.tm_year), mes, dia])) + \
-            "}}\n{{" + "{} {} {}".format(genero, serie_name, ano) + "}}"
+            "}}\n{{" + "{} {} {}".format(PARSER.genero, PARSER.serie_name,
+                                         PARSER.ano) + "}}"
 
         file_name = str(rodada) + "_" + mandante_nome[:3] + \
             visitante_nome[:3]
@@ -422,9 +438,9 @@ if __name__ == '__main__':
             mandante_nome.replace(' ', '_'), gols[1].text.strip(),
             gols[2].text.strip(), visitante_nome.replace(' ', '_'),
             dia, mes, dt.tm_year)
-        out = "{}\n\n\n{}\n\n\n".format(URL_FINAL, link) + out
-        file_path = "./{}/{}/{}_{}.txt".format(serie_path,
-                                               ano, jogo, file_name)
+        out = "{}\n\n\n{}\n\n\n".format(PARSER.url, link) + out
+        file_path = "./{}/{}/{}_{}.txt".format(PARSER.serie_path,
+                                               PARSER.ano, jogo, file_name)
         f = open(file_path, 'w')
         f.write(out)
         f.close()
@@ -432,8 +448,8 @@ if __name__ == '__main__':
         link_sum_b = 'https://conteudo.cbf.com.br/sumulas/{}/142{}.pdf\n'
 
         f_sum_b = open('sum_bor.list', 'a+')
-        f_sum_b.write(link_sum_b.format(ano, str(jogo) + "se"))
-        f_sum_b.write(link_sum_b.format(ano, str(jogo) + "b"))
+        f_sum_b.write(link_sum_b.format(PARSER.ano, str(jogo) + "se"))
+        f_sum_b.write(link_sum_b.format(PARSER.ano, str(jogo) + "b"))
         f_sum_b.close()
 
         print('Salvo em: {}'.format(file_path))
