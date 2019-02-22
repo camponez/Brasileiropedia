@@ -18,9 +18,14 @@ class ParserCBF():
 
     """Parser para site CBF"""
 
-    def __init__(self):
+    ano = None
+    serie_name = None
+
+    def __init__(self, ano=None, serie_name=None):
         """Initialize """
         self.__html = None
+        self.ano = ano
+        self.serie_name = serie_name
 
     @property
     def html(self):
@@ -130,21 +135,19 @@ class Masculino(ParserCBF):
     genero = 'Masculino '
 
     def __init__(self, serie_path, ano, n_jogo, serie_name):
-        ParserCBF.__init__(self)
+        ParserCBF.__init__(self, ano, serie_name)
         self.url = URL + self.competicao.format(serie_path, ano, n_jogo)
-        self.serie_name = serie_name
         self.serie_path = serie_path
-        self.ano = ano
 
 class Feminino(ParserCBF):
 
     competicao = "campeonato-brasileiro-feminino-{}/{}/{}"
     genero = 'Feminino '
 
-    def __init__(self, ano, n_jogo, serie_name, serie):
-        ParserCBF.__init__(self)
-        self.url = URL + self.competicao.format(serie, ano, n_jogo)
-        self.serie_name = serie_name
+    def __init__(self, serie_path, ano, n_jogo, serie_name):
+        ParserCBF.__init__(self, ano, serie_name)
+        self.url = URL + self.competicao.format(serie_path, ano, n_jogo)
+        self.serie_path = 'serie-' + serie_path
 
 
 if __name__ == '__main__':
@@ -152,8 +155,8 @@ if __name__ == '__main__':
     start = 102
     JOGOS = range(start, start + 10)
     for jogo in JOGOS:
-        PARSER = Masculino('serie-d', 2018, jogo, 'Série D')
-        # PARSER = Feminino('serie-d', 2018, jogo, 'Série D')
+        # PARSER = Masculino('serie-d', 2018, jogo, 'Série D')
+        PARSER = Feminino('a1', 2018, jogo, 'Série A1')
         try:
             CONTENT = request.urlopen(PARSER.url).read()
         except BaseException:
@@ -217,6 +220,8 @@ if __name__ == '__main__':
                 r_out = 'Atlético-AC'
             elif 'Guarani - MG' in nome:
                 r_out = 'Guarani-MG'
+            elif 'São José - RS' in nome:
+                r_out = 'São José-MG'
             elif 'Santos - AP' in nome:
                 r_out = 'Santos-AP'
             elif 'Barcelona - RO' in nome:
