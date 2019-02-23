@@ -112,12 +112,12 @@ class ParserCBF():
                 'bandeira': None},
             'aux1': {
                 'nome': html[3].text.strip(),
-                'bandeira': None if band2 == band else "{{Bandeira|" + \
+                'bandeira': None if band2 == band else "{{Bandeira|" +
                 band2 + "}}"
             },
             'aux2': {
                 'nome': html[6].text.strip(),
-                'bandeira': None if band3 == band else "{{Bandeira|" + \
+                'bandeira': None if band3 == band else "{{Bandeira|" +
                 band3 + "}}"}
         }
 
@@ -129,6 +129,7 @@ class ParserCBF():
         """
         pass
 
+
 class Masculino(ParserCBF):
 
     competicao = "campeonato-brasileiro-{}/{}/{}"
@@ -138,6 +139,7 @@ class Masculino(ParserCBF):
         ParserCBF.__init__(self, ano, serie_name)
         self.url = URL + self.competicao.format(serie_path, ano, n_jogo)
         self.serie_path = serie_path
+
 
 class Feminino(ParserCBF):
 
