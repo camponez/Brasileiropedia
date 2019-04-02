@@ -70,19 +70,34 @@ class ParserCBF():
         return self.html.has_attr('class')
 
     def gols(self):
+        """
+        Retorna gols
+        """
         return len(self.__html.find_all('ellipse'))
 
     def amarelo(self):
+        """
+        Detecta se é cartão amarelo
+        """
         if not self.__html.i:
             return False
         return 'icon-yellow-card' in self.__html.i.get('class')
 
     def vermelho(self):
+        """
+        Detecta se é cartão vermelho
+        """
         if not self.__html.i:
             return False
         return 'icon-red-card' in self.__html.i.get('class')
 
     def linha(self, mand=True):
+        """
+        Formatar a linha
+        @param mand: Linha do mandante
+        @type mand: bool
+        @return: linha formatada
+        """
         r_out = '{{'
         r_out += 'Titular' if self.titular() else 'Reserva'
         r_out += 'Mandante' if mand else 'Visitante'
@@ -98,6 +113,9 @@ class ParserCBF():
         return r_out + '}}'
 
     def arbitragem(self):
+        """
+        Formata arbitragem
+        """
 
         html = self.__html.find('table').find_all('td')
 
@@ -130,6 +148,9 @@ class ParserCBF():
         pass
 
 class Masculino(ParserCBF):
+    """
+    Classe para futebol Masculino
+    """
 
     competicao = "campeonato-brasileiro-{}/{}/{}"
     genero = 'Masculino '
@@ -140,6 +161,9 @@ class Masculino(ParserCBF):
         self.serie_path = serie_path
 
 class Feminino(ParserCBF):
+    """
+    Clases para futebol feminino
+    """
 
     competicao = "campeonato-brasileiro-feminino-{}/{}/{}"
     genero = 'Feminino '

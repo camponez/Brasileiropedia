@@ -155,7 +155,8 @@ class TestCBFParse(object):
 
     def test_arbitragem(self):
         html_code = """
-                <table class="table"><thead><tr><th class="p-b-15 p-t-15">Função</th> <th class="p-b-15 p-t-15">Nome</th> <th class="p-b-15 p-t-15">Categoria</th> <th class="p-b-15 p-t-15">Federação</th></tr></thead> <tbody><tr><th scope="row">Árbitro</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=1042" target="_blank" rel="noopener">
+                <table class="table"><thead><tr><th class="p-b-15 p-t-15">Função</th> <th class="p-b-15 p-t-15">Nome</th> <th class="p-b-15 p-t-15">Categoria</th> <th class="p-b-15 p-t-15">Federação</th>
+                </tr></thead> <tbody><tr><th scope="row">Árbitro</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=1042" target="_blank" rel="noopener">
                   Dewson Fernando Freitas da Silva
                 </a></td> <td>FIFA</td> <td>PA</td></tr> <tr><th scope="row">Árbitro Assistente 1</th> <td><a href="http://historicoarbitro.cbf.com.br/?id=596" target="_blank" rel="noopener">
                   Cleriston Clay Barreto Rios
