@@ -26,18 +26,33 @@ class TestCBFParse(object):
             "Egidio de Araujo Pereira Júnior"
 
     def test_titular(self):
+        """
+        Test se titlar
+        """
         assert self.parser.titular()
 
     def test_reserva(self):
+        """
+        Test sem reserva
+        """
         assert not self.parser.reserva()
 
     def test_no_amarelo(self):
+        """
+        Test sem amarelo
+        """
         assert not self.parser.amarelo()
 
     def test_no_vermelho(self):
+        """
+        Test sem cartão vemelho
+        """
         assert not self.parser.vermelho()
 
     def test_linha_jogador(self):
+        """
+        Test formatacao da linha jogador mandate e visitante
+        """
         assert self.parser.linha() == ('{{TitularMandante|Egidio de Araujo '
                                        'Pereira Júnior|Egidio}}')
 
@@ -46,6 +61,9 @@ class TestCBFParse(object):
                                             'Pereira Júnior|Egidio}}')
 
     def test_linha_jogador_reserva(self):
+        """
+        Test se linha do jogador reserva
+        """
         html_code = (
             """
             <li class="p-l-30">

@@ -1,27 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from parser.parser_cbf import ParserCBF
-from parser.parser_cbf import URL
+from parser.parser_cbf import Masculino
+from parser.parser_cbf import Feminino
 
 from urllib import request
 from bs4 import BeautifulSoup
 
 if __name__ == '__main__':
-    jogos = range(1, 100)
+    # jogos = range(1, 200)
+    JOGOS = [14, 13, 15]
     jogadores = []
-    for jogo in jogos:
-        serie_path = 'serie-c'
-        # serie_path = 'feminino-a1'
-        ano = 2017
-        jog = 'jogador'
+    for jogo in JOGOS:
+        # serie_path = 'serie-c'
+        serie_path = 'feminino-a2'
+        ano = 2019
+        jog = 'jogadora'
 
-        url_final = URL.format(serie_path, ano, jogo)
-        print(url_final)
-        content = request.urlopen(url_final).read()
+        parser = Feminino('a2', ano, jogo, 'Série A2')
+        # parser = Masculino('serie-c', 2018, jogo, 'Série C')
+        content = request.urlopen(parser.url).read()
         SOUP = BeautifulSoup(content, 'html.parser')
 
-        parser = ParserCBF()
         PLAYERS = SOUP.find(
             class_='jogo-escalacao').find_all(class_='col-xs-6')
 
@@ -44,13 +44,23 @@ if __name__ == '__main__':
                     "\n | nomecompleto  = {{PAGENAME}}" + \
                     "\n | posicao =" + \
                     "\n}}" +\
-                    "\n\n== Jogos por clube ==" + \
-                    "\n{{JogosPorClube" + \
-                    "\n | {} ".format(jog) + " = {{PAGENAME}}" + \
+                    "\n\n== Jogos por clube =="
+
+                if jog == 'jogadora':
+                    out += "\n{{JogosPorClubeFeminino"
+                else:
+                    out += "\n{{JogosPorClube"
+
+                out += "\n | {} ".format(jog) + " = {{PAGENAME}}" + \
                     "\n}}" + \
-                    "\n\n== Jogos por série ==" + \
-                    "\n{{JogosPorSerieMasculino" + \
-                    "\n | {} ".format(jog) + " = {{PAGENAME}}" + \
+                    "\n\n== Jogos por série =="
+
+                if jog == 'jogadora':
+                    out += "\n{{JogosPorSerieFeminino"
+                else:
+                    out += "\n{{JogosPorSerieMasculino"
+
+                out += "\n | {} ".format(jog) + " = {{PAGENAME}}" + \
                     "\n}}"
                 out += "\nyyyy"
                 print("Done: {}".format(player_name))
