@@ -19,6 +19,7 @@ SERIE = {
     'seriea1': {'path': 'a1', 'nome': 'Série A1'},
     'seriea2': {'path': 'a2', 'nome': 'Série A2'}
 }
+
 if __name__ == '__main__':
     grupo = ''
     start = 102
@@ -182,24 +183,24 @@ if __name__ == '__main__':
 
         gols = placar.find_all('strong', class_='time-gols')
 
-        def players(l_players, mandante):
+        def players(l_players, mandante_n):
             time = {
                 'jogador': [],
                 'banco': []
             }
             parser = ParserCBF()
 
-            for player in l_players.find_all('li'):
+            for _ in l_players.find_all('li'):
                 parser.html = player
-                info = {
+                info_ = {
                     'num': parser.player_number(),
-                    'nome': parser.linha(mandante),
+                    'nome': parser.linha(mandante_n),
                     'reserva': None
                 }
                 if parser.reserva():
-                    time['jogador'][-1]['reserva'] = info
+                    time['jogador'][-1]['reserva'] = info_
                 else:
-                    time['jogador'].append(info)
+                    time['jogador'].append(info_)
 
             return time
 

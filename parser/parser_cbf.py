@@ -7,8 +7,7 @@ URL += "/futebol-brasileiro/competicoes/"
 
 
 class ParserCBF():
-
-    """Parser para site CBF"""
+    """Parser para site CBF."""
 
     ano = None
     serie_name = None
@@ -27,6 +26,7 @@ class ParserCBF():
     def html(self, value):
         self.__html = value
 
+
     def player_name(self):
         """
         Format playername
@@ -35,9 +35,8 @@ class ParserCBF():
         return self.replace_name(name)
 
     def replace_name(self, name):
-        """
-        Replace names
-        """
+        """Replace names."""
+
         name = name.replace(' De ', ' de ')
         name = name.replace(' Da ', ' da ')
         name = name.replace(' E ', ' e ')
@@ -58,9 +57,7 @@ class ParserCBF():
             __import__('pdb').set_trace()
 
     def player_full_name(self):
-        """
-        Show player full name
-        """
+        """Show player full name."""
         full_name = self.__html.find(class_='list-desc').text.strip().title()
         return self.replace_name(full_name)
 
@@ -129,7 +126,6 @@ class ParserCBF():
         TODO: move all the parsing
         """
         pass
-
 
 class Masculino(ParserCBF):
     """
